@@ -5,7 +5,7 @@
   "main": "02.2-joke.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon script.js"
+    "dev": "nodemon joke.js"
   },
   "keywords": [],
   "author": "",
