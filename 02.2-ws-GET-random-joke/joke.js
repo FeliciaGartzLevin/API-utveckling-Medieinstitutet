@@ -34,7 +34,7 @@ const PORT = 3000
 const app = express()
 
 const data = require('./data/oneliners.json')
-shuffleArray(data)
+// shuffleArray(data)
 
 // GET /
 app.get('/', (req, res) => {
@@ -44,6 +44,7 @@ app.get('/', (req, res) => {
 
 // GET /joke
 app.get('/joke', (req, res) => {
+	shuffleArray(data)
   	res.json(data[0])
 });
 
