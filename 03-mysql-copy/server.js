@@ -5,6 +5,7 @@
 // Require stuff
 require('dotenv').config()
 const express = require('express')
+const { isDate } = require('lodash')
 const _ = require('lodash')
 const morgan = require('morgan')
 const PORT = 3000
@@ -68,7 +69,57 @@ app.get('/movies/:movieId', async (req, res) => {
 //  * @todo 2: Handle if no movie with the requested id exists
 //  */
 
+/**
+ * POST /movies
+ *
+ * Create a movie
+ */
+app.post('/movies', async (req, res) => {
+	console.log("Incoming!", req.body)
+	// const { title, genre, runtime, release_date } = req.body
 
+	// STEP 1: Check that all required data is present, otherwise fail with HTTP 400
+
+	// STEP 2: Check that the incoming data is of the correct data type
+
+	try{
+		const db = await connection
+		const [result] = await db.query('INSERT INTO movies SET ?', {
+			title: req.body.title,
+			genre: req.body.genre,
+			runtime: req.body.runtime ,
+		 	release_date: req.body.release_date,
+		})
+
+		// if (!response.ok) {
+		// 	throw new Error(`${response.status} ${response.statusText}`);
+		// }
+		const releaseDate = new Date(req.body.release_date)
+
+		// if(String(req.body.title)/* === isString() */ && String(req.body.genre) /* === isString() */ && Number(req.body.runtime) /* === isNumber() *//*  && Date(req.body.release_date) */ /*  === isDate() */){
+		if(typeof(req.body.title) === 'string' && typeof(req.body.genre)  === 'string'  && typeof(req.body.runtime)  === 'number'  && releaseDate instanceof Date ){
+			// Send back the received data and append the id of the newly created record
+			res.status(201).send({
+				...req.body,
+				id: result.insertId,
+			})
+			return
+		}else if(!req.body.title || !req.body.genre){
+				// Reply with error message
+				res.status(400).send({ message: 'Missing data or wrong data types.' })
+
+		}else{
+			// Reply with error message
+			res.status(400).send({ message: 'Missing data or wrong data types.' })
+		}
+
+	} catch (e){
+
+		// Reply with error message
+		res.status(400).send({ message: 'Missing data or wrong data types.' })
+	}
+
+})
 
 // Catch requests where a route does not exist
 app.use((req, res) => {
