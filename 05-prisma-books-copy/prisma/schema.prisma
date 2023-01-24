@@ -8,12 +8,16 @@ datasource db {
 }
 
 model Book {
-    id    Int    @id @default(autoincrement()) @db.UnsignedInt //@db.UnsignedInt = att den inte kan vara negativ
-    title String
-    pages Int    @db.UnsignedInt
+    id      Int      @id @default(autoincrement()) @db.UnsignedInt //@db.UnsignedInt = att den inte kan vara negativ
+    title   String
+    pages   Int      @db.UnsignedInt
+    authors Author[]
 }
 
 model Author {
-    id   Int    @id @default(autoincrement()) @db.UnsignedInt
-    name String
+    id    Int    @id @default(autoincrement()) @db.UnsignedInt
+    name  String
+    books Book[]
 }
+
+// `npx prisma db push` command pushar till databased
