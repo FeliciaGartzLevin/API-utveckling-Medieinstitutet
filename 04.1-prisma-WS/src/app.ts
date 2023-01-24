@@ -24,26 +24,38 @@ const main = async () => {
 	 * GET /users
 	 */
 		app.get('/users', async (req, res) => {
-			const users: any = await prisma.users.findMany()
-			res.send(users)
+			try{
+				const users: any = await prisma.users.findMany()
+				res.send(users)
+			}catch (err) {
+					console.error(err)
+					res.status(500).send({ message: "Something went wrong querying the database." })
+			}
 		})
 
 	/**
 	 * GET /user/1 + their phones
 	 */
 		app.get('/users/:userId', async (req, res) => {
-			const userId = Number(req.params.userId)
-			const user: any = await prisma.users.findUnique({
+			try{
+				const userId = Number(req.params.userId)
+				const user: any = await prisma.users.findUniqueOrThrow({
 
-				where: {
-					id: userId
-				},
-				include: {
-					phones: true,
-				}
+					where: {
+						id: userId
+					},
+					include: {
+						phones: true,
+					}
 
-			})
-			res.send(user)
+				})
+				res.send(user)
+			}catch (err) {
+				console.error(err)
+				res.status(404).send({
+					message: "User not found.",
+				})
+			}
 		})
 
 	/**
@@ -51,8 +63,13 @@ const main = async () => {
 	Get all phones.
 	 */
 	app.get('/phones', async (req, res) => {
-		const phones = await prisma.phones.findMany()
-		res.send(phones)
+		try{
+			const phones = await prisma.phones.findMany()
+			res.send(phones)
+		}catch (err) {
+			console.error(err)
+			res.status(500).send({ message: "Something went wrong querying the database." })
+		}
 	})
 
 
@@ -61,16 +78,24 @@ const main = async () => {
 	Get a single phone and their user (if exists).
 	 */
 	app.get('/phones/:phoneId', async (req, res) => {
-		const {phoneId} = req.params
-		const phone = await prisma.phones.findUnique({
-			where: {
-				id: Number(phoneId),
-			},
-			include: {
-				users: true
-			}
-		})
-		res.send(phone)
+		try{
+			const {phoneId} = req.params
+			const phone = await prisma.phones.findUniqueOrThrow({
+				where: {
+					id: Number(phoneId),
+				},
+				include: {
+					users: true
+				}
+			})
+			res.send(phone)
+
+		}catch (err) {
+			console.error(err)
+			res.status(404).send({
+				message: "Phone not found.",
+			})
+		}
 	})
 
 	/**
@@ -78,13 +103,19 @@ const main = async () => {
 	Create a new user (using Prisma).
 	 */
 	app.post('/users', async (req, res) => {
-		const { name } = req.body
-		const result = await prisma.users.create({
-		  data: {
-			name,
-		  },
-		})
-		res.json(result)
+		try{
+			const { name } = req.body
+			const result = await prisma.users.create({
+			  data: { //kunde skrivas data: req.body enbart istället
+				name,
+			  },
+			})
+			res.json(result)
+
+		}catch (err) {
+			console.error(err)
+			res.status(500).send({ message: "Something went wrong creating the record in the database." })
+		}
 	})
 
 	/**
@@ -92,27 +123,24 @@ const main = async () => {
 	Create a new phone (using Prisma).
 	 */
 	app.post('/phones', async (req, res) => {
-		const {
+	/* 	const {
 			manufacturer,
 			model,
 			imei,
 			user_id,
 			users,
-		} = req.body
+		} = req.body */
 		const result = await prisma.phones.create({
-			data: {
+			data: req.body /* {
   				manufacturer,
   				model,
   				imei,
   				user_id,
   				users,
-			}
+			} */
 		})
 		res.json(result)
 	})
-
-
-
 
 }
 
