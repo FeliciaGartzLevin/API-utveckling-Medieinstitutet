@@ -3,7 +3,7 @@ import http from 'http'
 import * as dotenv from 'dotenv'
 
 // Initialize dotenv so it reads our `.env`-file
-dotenv.config
+dotenv.config()
 
 // Read port to start server on from `.env`, otherwise default to port 3000
 const PORT = process.env.PORT || 3000
