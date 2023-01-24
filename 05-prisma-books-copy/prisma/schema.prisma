@@ -1,8 +1,19 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Book {
+    id    Int    @id @default(autoincrement()) @db.UnsignedInt //@db.UnsignedInt = att den inte kan vara negativ
+    title String
+    pages Int    @db.UnsignedInt
+}
+
+model Author {
+    id   Int    @id @default(autoincrement()) @db.UnsignedInt
+    name String
 }
