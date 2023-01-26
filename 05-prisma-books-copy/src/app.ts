@@ -1,6 +1,7 @@
 import express from "express"
 import prisma from "./prisma" // importing the prisma instance we created
 import morgan from "morgan"
+import { send, title } from "process"
 
 const app = express()
 app.use(express.json())
@@ -14,8 +15,6 @@ app.get('/', (req, res) => {
 		message: "I AM API, BEEP BOOP",
 	})
 })
-
-export default app
 
 /**
  * GET /authors
@@ -43,3 +42,67 @@ app.get('/books', async (req, res) => {
 		res.status(500).send({message: "Something went wrong"})
 	}
 })
+
+/**
+ * POST /authors
+ */
+app.post('/authors', async (req,res) => {
+	try{
+		const author = await prisma.author.create({
+			data: {
+				name: req.body.name
+			}
+		})
+		res.send(author)
+
+	}catch{
+		res.status(500).send({ message: "Something went wrong" })
+	}
+})
+
+/**
+ * POST /books
+ */
+app.post('/books', async (req,res) => {
+	try{
+		const author = await prisma.book.create({
+			data: {
+				title: req.body.title,
+				pages: req.body.pages,
+			}
+		})
+		res.send(author)
+
+	}catch{
+		res.status(500).send({ message: "Something went wrong" })
+	}
+})
+
+/**
+ * POST /authors/:authorId/books
+ */
+app.post('/authors/:authorId/books', async (req, res) => {
+	try {
+		const result = await prisma.author.update({
+			where: {
+				id: Number(req.params.authorId),
+			},
+			data: {
+				books: {
+					connect: {
+						id: req.body.bookId,
+					}
+				}
+			},
+			include: {
+				books: true,
+			}
+		})
+		res.status(201).send(result)
+	} catch (err) {
+		res.status(500).send({ message: "Something went wrong" })
+	}
+})
+
+
+export default app
