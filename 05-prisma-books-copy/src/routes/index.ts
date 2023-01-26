@@ -1,5 +1,8 @@
 import express from 'express'
 import authors from './authors'
+import books from './books'
+import publishers from './publishers'
+
 const router = express.Router()
 
 /**
@@ -20,5 +23,10 @@ router.use('/authors', authors)
  *  /books
  */
 router.use('/books', books)
+
+/**
+ *  /publishers
+ */
+router.use('/publishers', publishers)
 
 export default router

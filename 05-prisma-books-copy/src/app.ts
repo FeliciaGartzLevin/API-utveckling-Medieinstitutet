@@ -1,5 +1,5 @@
 import express from "express"
-import prisma from "./prisma" // importing the prisma instance we created
+// import prisma from "./prisma" // importing the prisma instance we created
 import morgan from "morgan"
 import routes from './routes'
 
