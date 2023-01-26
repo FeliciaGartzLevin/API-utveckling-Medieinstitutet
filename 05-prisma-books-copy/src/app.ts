@@ -46,16 +46,16 @@ app.get('/books', async (req, res) => {
 /**
  * POST /authors
  */
-app.post('/authors', async (req,res) => {
-	try{
+app.post('/authors', async (req, res) => {
+	try {
 		const author = await prisma.author.create({
 			data: {
-				name: req.body.name
+				name: req.body.name,
+				birthdate: req.body.birthdate,
 			}
 		})
 		res.send(author)
-
-	}catch{
+	} catch (err) {
 		res.status(500).send({ message: "Something went wrong" })
 	}
 })
@@ -63,17 +63,18 @@ app.post('/authors', async (req,res) => {
 /**
  * POST /books
  */
-app.post('/books', async (req,res) => {
-	try{
-		const author = await prisma.book.create({
+app.post('/books', async (req, res) => {
+	try {
+		const book = await prisma.book.create({
 			data: {
 				title: req.body.title,
 				pages: req.body.pages,
+				isbn: req.body.isbn,
+				publisherId: req.body.publisherId,
 			}
 		})
-		res.send(author)
-
-	}catch{
+		res.send(book)
+	} catch (err) {
 		res.status(500).send({ message: "Something went wrong" })
 	}
 })
