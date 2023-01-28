@@ -1,12 +1,12 @@
 /**
  * Author Controller
  */
-// import { Debug } from 'debug'
+import Debug from 'debug'
 import { Request, Response } from 'express'
 import prisma from '../prisma'
 
 // Create a new debug instance
-// const debug = Debug('prisma-books:author_controller')
+const debug = Debug('prisma-books:author_controller')
 
 
 /**
@@ -81,7 +81,7 @@ export const addBook = async (req: Request, res: Response) => {
 		})
 		res.status(201).send(result)
 	} catch (err) {
-		// debug("Error thrown when adding book %o to a author %o: %o", req.body.bookId, req.params.authorId, err)
+		debug("Error thrown when adding book %o to a author %o: %o", req.body.bookId, req.params.authorId, err)
 		res.status(500).send({ message: "Something went wrong" })
 	}
 }
