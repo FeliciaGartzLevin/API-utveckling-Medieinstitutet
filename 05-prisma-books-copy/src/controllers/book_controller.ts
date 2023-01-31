@@ -14,7 +14,10 @@ const debug = Debug('prisma-books:book_controller')
 export const index = async (req: Request, res: Response) => {
 	try{
 		const books = await prisma.book.findMany()
-		res.send(books)
+		res.send({
+			status: "success",
+			data: books,
+		})
 
 	}catch(err){
 		debug("Error thrown when finding books", err)
@@ -38,9 +41,10 @@ export const show = async (req: Request, res: Response) => {
 				publisher: true,
 			}
 		})
-
-		res.send(book)
-
+		res.send({
+			status: "success",
+			data: book,
+		})
 	} catch (err) {
 		debug("Error thrown when finding book with id %o: %o", req.params.bookId, err)
 		return res.status(404).send({ message: "Not found" })
@@ -58,9 +62,13 @@ export const store = async (req: Request, res: Response) => {
 				pages: req.body.pages,
 				isbn: req.body.isbn,
 				publisherId: req.body.publisherId,
+				cover: req.body.cover,
 			}
 		})
-		res.send(book)
+		res.send({
+			status: "success",
+			data: book,
+		})
 	} catch (err) {
 		debug("Error thrown when creating a book %o: %o", req.body, err)
 		res.status(500).send({ message: "Something went wrong" })

@@ -7,6 +7,9 @@
     "dev": "cross-env DEBUG=prisma-books:* nodemon server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -26,6 +29,7 @@
     "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-validator": "^6.14.3",
     "morgan": "^1.10.0"
   }
 }
