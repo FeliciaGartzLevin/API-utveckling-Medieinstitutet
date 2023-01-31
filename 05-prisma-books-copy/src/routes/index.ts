@@ -1,4 +1,5 @@
 import express from 'express'
+import { register } from '../controllers/register_controller'
 import authors from './authors'
 import books from './books'
 import publishers from './publishers'
@@ -28,5 +29,12 @@ router.use('/books', books)
  *  /publishers
  */
 router.use('/publishers', publishers)
+
+/**
+ * /register
+ */
+router.post('/register', [
+		// place validation rules here
+], register)
 
 export default router
