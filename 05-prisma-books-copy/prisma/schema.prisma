@@ -31,5 +31,12 @@ model Publisher {
     books Book[]
 }
 
+model User {
+    id       Int    @id @default(autoincrement()) @db.UnsignedInt
+    name     String
+    email    String @unique
+    password String
+}
+
 // `npx prisma db push` command pushar till databasen
 // `npx prisma migrate dev --name blabla-blala` för att migrera de nya ändringarna och ta bort de gamla helt
