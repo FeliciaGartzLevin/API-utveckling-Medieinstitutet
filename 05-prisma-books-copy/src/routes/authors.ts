@@ -4,7 +4,7 @@
 
 import express from 'express'
 import {body} from 'express-validator'
-import { index, store, addBook } from '../controllers/author_controller'
+import { index, show, store, addBook } from '../controllers/author_controller'
 import prisma from '../prisma'
 const router = express.Router()
 
@@ -13,6 +13,12 @@ const router = express.Router()
  */
 
 router.get('/', index)
+
+/**
+ * GET /authors/:authorId
+ */
+router.get('/:authorId', show)
+
 /**
  * POST /authors
  */
