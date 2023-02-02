@@ -24,7 +24,7 @@ export const register = async (req: Request, res: Response) => {
 
 	// Get only the validated data from the request
 	const validatedData = matchedData(req)
-	console.log("req.body:", req.body)
+	// console.log("req.body:", req.body)
 	console.log("validatedData:", validatedData)
 
 	// Calculate a hash + salt for the password
