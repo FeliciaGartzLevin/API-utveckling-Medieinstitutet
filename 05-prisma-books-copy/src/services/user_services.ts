@@ -4,6 +4,7 @@
 */
 
 import prisma from "../prisma"
+import { CreateUserData } from "../types"
 
 /**
  *  Get user by email
@@ -16,5 +17,17 @@ export const getUserByEmail = async (email: string) => {
 		where: {
 			email: email, //kan skrivas bara 'email' när key och value är samma
 		}
+	})
+}
+
+/**
+ * Create a user
+ *
+ * @param data User Details
+ */
+export const createUser = async (data: CreateUserData) => {
+
+	return await prisma.user.create({
+		data
 	})
 }
