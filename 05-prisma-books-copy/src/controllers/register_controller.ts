@@ -6,9 +6,8 @@ import { debug } from 'console'
 import Debug from 'debug'
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
+import { createUser } from '../services/user_services'
 import { matchedData, validationResult } from 'express-validator'
-import prisma from '../prisma'
-
 /**
  * Register a new user
  */
@@ -36,15 +35,11 @@ export const register = async (req: Request, res: Response) => {
 
  	// Store the user in the database
 	try{
-		const user = await prisma.user.create({
-			data: {
-				name: validatedData.name,
-				email: validatedData.email,
-				password: validatedData.password
-			}
-
+		const user = await createUser({
+			name: validatedData.name,
+			email: validatedData.email,
+			password: validatedData.password
 		})
-
 
 	// Respond with 201 Created + status success
 	res.status(201).send({
@@ -54,7 +49,7 @@ export const register = async (req: Request, res: Response) => {
 
 
 	}catch (err){
-		debug("Error thrown when finding products", err)
+		debug("Error thrown at %o when trying to create user", req.body, err)
 		return res.status(500).send({ status: "error", message: "Could not create user in database" })
 	}
 

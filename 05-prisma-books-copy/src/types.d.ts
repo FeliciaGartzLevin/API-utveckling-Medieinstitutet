@@ -15,3 +15,9 @@ export type CreateBookData = {
 	}?,
 	publisherId: number,
 }
+
+export type CreateUserData = {
+	name: string,
+	email: string,
+	password: string,
+}

@@ -17,10 +17,13 @@ const debug = Debug('prisma-books:author_controller')
 export const index = async (req: Request, res: Response) => {
 		try{
 			const authors = await getAuthors()
-			res.send(authors)
+			res.send({
+				status: "success",
+				data: authors
+			})
 
 		}catch(err){
-			res.status(500).send({message: "Something went wrong"})
+			res.status(500).send({ status: "error", message: "Something went wrong"})
 		}
 }
 
@@ -31,21 +34,14 @@ export const show = async (req: Request, res: Response) => {
 	const authorId = Number(req.params.authorId)
 
 	try {
-		const author = await prisma.author.findUniqueOrThrow({
-			where: {
-				id: authorId,
-			},
-			include: {
-				books: true
-			}
-		})
+		const author = await getAuthor(authorId)
 		res.send({
 			status: "success",
 			data: author,
 		})
 	} catch (err) {
 		debug("Error thrown when finding author with id %o: %o", req.params.authorId, err)
-		return res.status(404).send({ message: "Not found" })
+		return res.status(404).send({ status: "error", message: "Not found" })
 	}
 }
 
@@ -64,15 +60,15 @@ export const store = async (req: Request, res: Response) => {
 	// const birthdate = (new Date(req.body.birthdate)).toISOString()
 
 		try {
-			const author = await prisma.author.create({
-				data: {
-					name: req.body.name,
-					// birthdate: birthdate,
-				}
+			const author = await createAuthor({
+				name: req.body.name
 			})
-			res.send(author)
+			res.send({
+				status: "success",
+				data: author,
+			})
 		} catch (err) {
-			res.status(500).send({ message: "Something went wrong" })
+			res.status(500).send({ status: "error", message: "Something went wrong" })
 		}
 }
 
@@ -111,6 +107,6 @@ export const addBook = async (req: Request, res: Response) => {
 		res.status(201).send(result)
 	} catch (err) {
 		debug("Error thrown when adding book %o to a author %o: %o", req.body.authorId, req.params.authorId, err)
-		res.status(500).send({ message: "Something went wrong" })
+		res.status(500).send({ status: "error", message: "Something went wrong" })
 	}
 }
