@@ -9,10 +9,10 @@ export type CreateBookData = {
 	title: string,
 	pages: number,
 	isbn: string,
-	cover: {
+	cover?: {
 		thumbnail: string,
 		large: string,
-	}?,
+	},
 	publisherId: number,
 }
 
@@ -20,4 +20,11 @@ export type CreateUserData = {
 	name: string,
 	email: string,
 	password: string,
+}
+
+export type JwtPayload = {
+	sub: number,
+	name: string,
+	iat?: number,
+	exp?: number,
 }

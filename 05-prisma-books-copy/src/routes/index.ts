@@ -4,6 +4,7 @@ import authors from './authors'
 import books from './books'
 import publishers from './publishers'
 import { createUserRules  } from '../validations/user_rules'
+import { validateToken } from '../middleware/auth/jwt'
 import profile from './profile'
 
 const router = express.Router()
@@ -30,7 +31,7 @@ router.use('/books', books)
 /**
  *  /profile
  */
-router.use('/profile', profile)
+router.use('/profile', validateToken, profile)
 
 /**
  *  /publishers
