@@ -6,8 +6,60 @@ import { debug } from 'console'
 import Debug from 'debug'
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
-import { createUser } from '../services/user_services'
 import { matchedData, validationResult } from 'express-validator'
+import { createUser, getUserByEmail } from '../services/user_services'
+import jwt from 'jsonwebtoken'
+
+
+/**
+ * Login a user
+ */
+export const login = async (req: Request, res: Response) => {
+	// destructure email and password from request body
+	const { email, password } = req.body
+
+	// find user with email, otherwise bail 🛑
+	const user = await getUserByEmail(email)
+	if (!user) {
+		return res.status(401).send({
+			status: "fail",
+			message: "Authorization required",
+		})
+	}
+
+	// verify hash against credentials, otherwise bail 🛑
+	const result = await bcrypt.compare(password, user.password)
+	if (!result) {
+		return res.status(401).send({
+			status: "fail",
+			message: "Authorization required",
+		})
+	}
+
+	// construct jwt-payload
+	const payload = {
+		sub: user.id,     // sub = subject the token is issued for
+		name: user.name,
+	}
+
+	// sign payload with secret and get access token
+	if (!process.env.ACCESS_TOKEN_SECRET) {
+		return res.status(500).send({
+			status: "error",
+			message: "No access token secret defined",
+		})
+	}
+	const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+
+	// respond with access-token
+	res.send({
+		status: "success",
+		data: {
+			access_token,  // access_token: access_token
+		}
+	})
+}
+
 /**
  * Register a new user
  */

@@ -1,5 +1,5 @@
 import express from 'express'
-import { register } from '../controllers/register_controller'
+import { login, register } from '../controllers/user_controller'
 import authors from './authors'
 import books from './books'
 import publishers from './publishers'
@@ -36,6 +36,11 @@ router.use('/profile', profile)
  *  /publishers
  */
 router.use('/publishers', publishers)
+
+/**
+ * 	/login
+ */
+router.post('/login', login)
 
 /**
  * /register
