@@ -9,6 +9,7 @@ import { Request, Response } from 'express'
 import { matchedData, validationResult } from 'express-validator'
 import { createUser, getUserByEmail } from '../services/user_services'
 import jwt from 'jsonwebtoken'
+import { JwtPayload } from '../types'
 
 
 /**
@@ -37,9 +38,10 @@ export const login = async (req: Request, res: Response) => {
 	}
 
 	// construct jwt-payload
-	const payload = {
+	const payload: JwtPayload = {
 		sub: user.id,     // sub = subject the token is issued for
 		name: user.name,
+		email: user.email,
 	}
 
 	// sign payload with secret and get access token
@@ -49,7 +51,9 @@ export const login = async (req: Request, res: Response) => {
 			message: "No access token secret defined",
 		})
 	}
-	const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+	const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+		expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '4h',
+	})
 
 	// respond with access-token
 	res.send({
