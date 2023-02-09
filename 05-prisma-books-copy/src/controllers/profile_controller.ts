@@ -14,15 +14,11 @@ export const getProfile = async (req: Request, res: Response) => {
 	// User has authenticated successfully
 
 	// WHO DIS?
-	debug("WHO DIS?!: %o", req.user)
+	debug("WHO DIS?!: %o", req.token)
 
 	res.send({
 		status: "success",
-		data: {
-			id: req.user.id,
-			name: req.user.name,
-			email: req.user.email,
-		},
+		data: req.token,
 	})
 }
 
