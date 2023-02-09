@@ -24,7 +24,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
 
 /**
- * Update a resource
+ * Update the authenticated user's profile
  */
 export const updateProfile = async (req: Request, res: Response) => {
 }

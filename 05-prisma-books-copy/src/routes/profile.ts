@@ -9,7 +9,7 @@ const router = express.Router()
 /**
  * GET /profile
  */
-router.get('/', basic, getProfile)
+router.get('/', getProfile)
 
 /**
  * PATCH /profile

@@ -2,7 +2,6 @@
  * Register Controller
  */
 
-import { debug } from 'console'
 import Debug from 'debug'
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
@@ -11,6 +10,7 @@ import { createUser, getUserByEmail } from '../services/user_services'
 import jwt from 'jsonwebtoken'
 import { JwtPayload } from '../types'
 
+const debug = Debug('prisma-books:user_controller')
 
 /**
  * Login a user
@@ -71,6 +71,7 @@ export const login = async (req: Request, res: Response) => {
 		status: "success",
 		data: {
 			access_token,  // access_token: access_token
+			refresh_token,
 		}
 	})
 }
@@ -114,12 +115,10 @@ export const register = async (req: Request, res: Response) => {
 			data: req.body
 		})
 
-
 	}catch (err){
 		debug("Error thrown at %o when trying to create user", req.body, err)
 		return res.status(500).send({ status: "error", message: "Could not create user in database" })
 	}
-
 }
 
 /**
@@ -131,30 +130,64 @@ export const register = async (req: Request, res: Response) => {
  */
 export const refresh = (req: Request, res: Response) => {
 	// Make sure authorization header exists
+	if (!req.headers.authorization) {
+		debug("Authorization header missing")
 
-	// Split authorization header on ' '
-
-	// Make sure Authorization schema is "Bearer"
-
-	// Verify refresh-token and get refresh-token payload
-	const payload = {
-		iat: '',
-		exp: '',
+		return res.status(401).send({
+			status: "fail",
+			data: "Authorization required",
+		})
 	}
 
-	// Construct access-token payload
+	// Split authorization header on ' '
+	const [authSchema, token] = req.headers.authorization.split(" ")
 
+	// Make sure Authorization schema is "Bearer"
+	if (authSchema.toLowerCase() !== "bearer") {
+		debug("Authorization schema isn't Bearer")
 
-	// Remove `iat` and `exp` from refresh token payload
-	// delete payload.iat
-	// delete payload.exp
+		return res.status(401).send({
+			status: "fail",
+			data: "Authorization required",
+		})
+	}
 
-	// Issue a new access token
+	// Verify refresh-token and get refresh-token payload
+	try {
+		// Verify refresh-token using refresh-token secret
+		const payload = (jwt.verify(token, process.env.REFRESH_TOKEN_SECRET || "") as unknown) as JwtPayload
 
-	// Respond with new access token
-	res.send({
-		status: "success",
-		data: {},
-	})
+		// // remove `iat` and `exp` from payload
+		// delete payload.iat
+		// delete payload.exp
+
+		// Issue a new access token
+		if (!process.env.ACCESS_TOKEN_SECRET) {
+			return res.status(500).send({
+				status: "error",
+				message: "No access token secret defined",
+			})
+		}
+		const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+			expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '4h',
+		})
+
+		// Respond with new access token
+		res.send({
+			status: "success",
+			data: {
+				access_token,
+			},
+		})
+
+	} catch (err) {
+		debug("Token failed verification", err)
+
+		return res.status(401).send({
+			status: "fail",
+			data: "Authorization required",
+		})
+	}
+
 
 }

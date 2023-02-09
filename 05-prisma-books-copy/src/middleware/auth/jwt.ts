@@ -29,11 +29,13 @@ export const validateToken = (req: Request, res: Response, next: NextFunction) =
 	}
 
 	// Split Authorization header on ` `
+	// "Bearer <token>"
 	const [authSchema, token] = req.headers.authorization.split(' ')
 
 	// Check that Authorization scheme is "Bearer", otherwise bail 🛑
 	if(authSchema.toLowerCase() !== 'bearer'){
 		debug("Authorization schema isn't Bearer")
+		debug("authSchema: ", authSchema)
 
 		return res.status(401).send({
 			status: "fail",
