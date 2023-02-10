@@ -22,6 +22,12 @@ export type CreateUserData = {
 	password: string,
 }
 
+export type UpdateUserData = {
+	name?: string,
+	email?: string,
+	password?: string,
+}
+
 export type JwtPayload = {
 	sub: number,
 	name: string,

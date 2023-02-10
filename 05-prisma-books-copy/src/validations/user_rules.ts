@@ -6,6 +6,7 @@ import prisma from '../prisma'
 import { getUserByEmail } from '../services/user_services'
 
 
+
 export const createUserRules = [
 	body('name').isString().withMessage('Name has to be of type string').bail().isLength({ min: 3}).withMessage('Name must be at least 3 characters long'),
 	body('email').exists().withMessage('Emailadress is required').bail().custom(async value => {
@@ -22,6 +23,14 @@ export const createUserRules = [
 // vill man patcha för att t ex ändra lösenord kan andra verifieringsregler användas och importeras till vardera route
 export const updateUserRules = [
 	body('name').optional().isString().bail().isLength({ min: 3 }),
-	body('email').optional().isEmail(),
+	body('email').optional().isEmail().custom(async (value: string) => {
+		// check if a User with that email already exists
+		const user = await getUserByEmail(value)
+
+		if (user) {
+			// user already exists, throw a hissy-fit
+			return Promise.reject("Email already exists")
+		}
+	}),
 	body('password').optional().isString().bail().isLength({ min: 6 }),
 ]

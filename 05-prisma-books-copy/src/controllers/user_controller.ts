@@ -158,8 +158,8 @@ export const refresh = (req: Request, res: Response) => {
 		const payload = (jwt.verify(token, process.env.REFRESH_TOKEN_SECRET || "") as unknown) as JwtPayload
 
 		// // remove `iat` and `exp` from payload
-		// delete payload.iat
-		// delete payload.exp
+		delete payload.iat
+		delete payload.exp
 
 		// Issue a new access token
 		if (!process.env.ACCESS_TOKEN_SECRET) {
