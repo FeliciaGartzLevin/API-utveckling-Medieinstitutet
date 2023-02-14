@@ -85,9 +85,19 @@ export const destroy = async (req: Request, res: Response) => {
 }
 
 /**
- * Link a book to a author
+ * Link books to an author
  */
 export const addBook = async (req: Request, res: Response) => {
+	console.log("Books to connect: ", req.body.bookIds)
+	const bookIds = req.body.bookIds.map((bookId: number) => {
+		return {
+			id: bookId,
+		}
+	})
+	console.log('Books after map: ', bookIds)
+
+	return res.send()
+
 	try {
 		const result = await prisma.author.update({
 			where: {
@@ -95,9 +105,7 @@ export const addBook = async (req: Request, res: Response) => {
 			},
 			data: {
 				books: {
-					connect: {
-						id: req.body.authorId,
-					}
+					connect: bookIds,
 				}
 			},
 			include: {
@@ -107,6 +115,30 @@ export const addBook = async (req: Request, res: Response) => {
 		res.status(201).send(result)
 	} catch (err) {
 		debug("Error thrown when adding book %o to a author %o: %o", req.body.authorId, req.params.authorId, err)
+		res.status(500).send({ status: "error", message: "Something went wrong" })
+	}
+}
+/**
+ * Unlink books from an author
+ */
+export const removeBook = async (req: Request, res: Response) => {
+	try {
+		await prisma.author.update({
+			where: {
+				id: Number(req.params.authorId),
+			},
+			data: {
+				books: {
+					disconnect: {
+						id: Number(req.params.bookId),
+					}
+				}
+			}
+		})
+
+
+	} catch (err) {
+		debug("Error thrown when removing book %o from author %o: %o", req.body.authorId, req.params.authorId, err)
 		res.status(500).send({ status: "error", message: "Something went wrong" })
 	}
 }
