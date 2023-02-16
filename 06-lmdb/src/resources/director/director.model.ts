@@ -2,7 +2,7 @@ import mongoose, { model, Schema, Document } from "mongoose";
 
 export interface IDirector extends Document{ //extends=ärver egenskaper från sina föräldrar
 	name: string,
-	country: string,
+	country?: string,
 	birthdate?: Date,
 }
 
@@ -13,6 +13,12 @@ const DirectorSchema: Schema = new Schema<IDirector>({
 		trim: true,
 		minlength: 5,
 		unique: true,
+	},
+
+	country: {
+		type: String,
+		minlength: 2,
+		trim: true,
 	},
 
 	birthdate: {

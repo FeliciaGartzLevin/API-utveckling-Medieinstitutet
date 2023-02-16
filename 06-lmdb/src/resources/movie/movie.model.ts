@@ -1,4 +1,5 @@
 import mongoose, { model, Schema, Document } from "mongoose";
+import { IDirector } from "../director/director.model";
 
 export interface IMovie extends Document{ //=ärver egenskaper från sina föräldrar
 	title: string,
@@ -6,6 +7,7 @@ export interface IMovie extends Document{ //=ärver egenskaper från sina förä
 	releaseYear?: number,
 	genres: string[],
 	watched?: Date,
+	director?: IDirector['_id'],
 }
 
 const MovieSchema: Schema = new Schema<IMovie>({
@@ -44,7 +46,11 @@ const MovieSchema: Schema = new Schema<IMovie>({
 		default() { //en funktion eftersom den annars anger tiden när servern senast startades.
 			return Date.now()
 		},
-	}
+	},
+	director: {
+		type: Schema.Types.ObjectId,
+		ref: 'Director',
+	},
 })
 
 export const Movie = model<IMovie>('Movie', MovieSchema)

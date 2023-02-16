@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { matchedData, validationResult } from 'express-validator'
 import Debug from 'debug'
 import { Director } from "./director.model";
 import mongoose from "mongoose";
@@ -56,18 +55,7 @@ export const show = async (req: Request, res: Response) => {
  * Create a director
  */
 export const store = async (req: Request, res: Response) => {
-/* 	 // Check for validation errors
-	const validationErrors = validationResult(req)
-	if (!validationErrors.isEmpty()) {
-		return res.status(400).send({
-			status: "fail",
-			data: validationErrors.array(),
-		})
-	}
 
-	// Get only the validated data from the request
-	const validatedData = matchedData(req)
- */
 	try {
 		// Create a new director
 		const director = await new Director(req.body).save()
