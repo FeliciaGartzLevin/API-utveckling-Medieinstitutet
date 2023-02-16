@@ -7,9 +7,22 @@ export interface IMovie extends Document{ //=ärver egenskaper från sina förä
 }
 
 const MovieSchema: Schema = new Schema<IMovie>({
-	title: {type: String, required: true},
-	runtime: Number, //behöver ej skriva hela objektet på raden ovan då required: false =default
-	releaseYear: Number,
+	title: {
+		type: String,
+		required: true,
+		trim: true,
+		minlength: 3,
+		unique: true,
+	},
+	runtime: {
+		type: Number,
+		min: 1,
+	},
+	releaseYear: {
+		type: Number,
+		min: 1888,
+		max: new Date().getFullYear(),
+	},
 })
 
 export const Movie = model<IMovie>('Movie', MovieSchema)
