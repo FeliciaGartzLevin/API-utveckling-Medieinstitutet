@@ -2,8 +2,10 @@ import mongoose, { model, Schema, Document } from "mongoose";
 
 export interface IMovie extends Document{ //=ärver egenskaper från sina föräldrar
 	title: string,
-	runtime?: number,
+	runtime: number | null,
 	releaseYear?: number,
+	genres: string[],
+	watched?: Date,
 }
 
 const MovieSchema: Schema = new Schema<IMovie>({
@@ -16,13 +18,33 @@ const MovieSchema: Schema = new Schema<IMovie>({
 	},
 	runtime: {
 		type: Number,
-		min: 1,
+		default: null,
+		// min: 1,
+		validate(value: number){
+			// if-satser kan skrivas så också
+			if(value < 1 && value !== null){ //if satsen kan göras utan curly brackets
+				throw new Error("Just because you thought the movie was bad it shouldn't have a zero or negative runtime.")
+			}
+		}
+
 	},
 	releaseYear: {
 		type: Number,
 		min: 1888,
 		max: new Date().getFullYear(),
 	},
+	genres: {
+		type: [String],
+		lowercase: true,
+		default: [],
+		// enum: ['sci-fi', 'romance', 'comedy']
+	},
+	watched: {
+		type: Date,
+		default() { //en funktion eftersom den annars anger tiden när servern senast startades.
+			return Date.now()
+		},
+	}
 })
 
 export const Movie = model<IMovie>('Movie', MovieSchema)

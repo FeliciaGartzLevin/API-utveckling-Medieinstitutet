@@ -16,6 +16,6 @@ router.get('/:movieId', show)
 /**
  * POST /movies
  */
-router.post('/', createMovieRules, store)
+router.post('/', /* createMovieRules, */ store)
 
 export default router
