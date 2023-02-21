@@ -2,6 +2,7 @@ import app from './src/app'
 import http from 'http'
 import * as dotenv from 'dotenv'
 import { Server } from 'socket.io'
+import { handleConnection } from './src/controllers/socket_controller'
 
 // Initialize dotenv so it reads our `.env`-file
 dotenv.config()
@@ -24,7 +25,9 @@ const io = new Server(httpServer, {
  * Handle incoming Socket.IO connection
  */
 io.on('connection', (socket) => {
-	console.log('Yay, someone connected to me 👴', socket.id)
+	// console.log('Yay, someone connected to me 👴', socket.id)
+	handleConnection(socket)
+
 })
 
 /**
