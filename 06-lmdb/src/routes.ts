@@ -1,6 +1,6 @@
 import express from "express"
-import movierouter from './resources/movie/movie.router'
-import directorrouter from './resources/director/director.router'
+import movieRouter from './resources/movie/movie.router'
+import personRouter from './resources/person/person.router'
 
 // instantiate a new router
 const router = express.Router()
@@ -17,11 +17,11 @@ router.get('/', async (req, res) => {
 /**
  * /movies
  */
-router.use('/movies', movierouter)
+router.use('/movies', movieRouter)
 
 /**
- *  /directors
+ *  /people
  */
-router.use('/directors', directorrouter)
+router.use('/people', personRouter)
 
 export default router
