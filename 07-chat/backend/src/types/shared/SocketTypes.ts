@@ -4,11 +4,13 @@ export {}
 export interface ServerToClientEvents {
 	hello: () => void
 	chatMessage: (data: ChatMessageData) => void
+	userJoined: (notice: NoticeData) => void
 }
 
 // Events emitted by the client to the server
 export interface ClientToServerEvents {
 	sendChatMessage: (data: ChatMessageData) => void
+	userJoin: (username: string, callback: (success: boolean) => void) => void
 }
 
 // Events between servers
@@ -20,4 +22,9 @@ export interface ChatMessageData {
 	content: string
 	timestamp: number
 	username: string
+}
+// Notice payload
+export interface NoticeData {
+	username: string,
+	timestamp: number
 }
