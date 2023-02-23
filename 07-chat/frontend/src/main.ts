@@ -8,9 +8,20 @@ import {
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 
+// Forms
 const messageEl = document.querySelector('#message') as HTMLInputElement
 const messageFormEl = document.querySelector('#message-form') as HTMLFormElement
-const messagesEl = document.querySelector('#messages') as HTMLDivElement
+const usernameFormEl = document.querySelector('#username-form') as HTMLFormElement
+
+// Lists
+const messagesEl = document.querySelector('#messages') as HTMLUListElement
+
+// Views
+const chatWrapperEl = document.querySelector('#chat-wrapper') as HTMLDivElement
+const startEl = document.querySelector('#start') as HTMLDivElement
+
+// User Details
+let username: string | null = null
 
 // Connect to Socket.IO server
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -18,7 +29,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 /* Min Lösning
  *
 // add a message to the chat
-då behlver man inserta message.content
+då behöver man inserta message.content
 const addMessageToChat = (message: string, ownmessage: boolean) => {
 
 	let own = ''
@@ -45,7 +56,9 @@ const addMessageToChat = (message: ChatMessageData, ownMessage = false) => {
 	}
 
 	// Set the text content of the LI element to the message
-	messageEl.textContent = message.content
+	messageEl.innerHTML = ownMessage
+	? `<span class="content">${message.content}</span>`
+	: `<span class="user">${message.username}</span><span class="content">${message.content}</span>`
 
 	// Append the LI element to the messages element
 	messagesEl.appendChild(messageEl)
@@ -54,7 +67,17 @@ const addMessageToChat = (message: ChatMessageData, ownMessage = false) => {
 	messageEl.scrollIntoView({ behavior: 'smooth' })
 }
 
+// Show chat view
+const showChatView = () => {
+	startEl.classList.add('hide')
+	chatWrapperEl.classList.remove('hide')
+}
 
+// Show welcome view
+const showWelcomeView = () => {
+	chatWrapperEl.classList.add('hide')
+	startEl.classList.remove('hide')
+}
 
 // Listen for when connection is established
 socket.on('connect', () => {
@@ -83,17 +106,19 @@ socket.on('chatMessage', (message) => {
 messageFormEl.addEventListener('submit', e => {
 	e.preventDefault()
 
-	if(!messageEl.value.trim()){
+	if(!messageEl.value.trim() || !username){
 		return
 	}
 
 	// Construct message payload
 	const message: ChatMessageData = {
+		username: username,
+		timestamp: Number(new Date()),
 		content: messageEl.value,
 	}
 
 	// Send (emit) message to the server
-	socket.emit('sendChatMessage', message)
+	socket.emit('sendChatMessage', message, username)
 
 	// print message to chat. boolean: is your it own message?
 	addMessageToChat(message, true)
@@ -103,4 +128,20 @@ messageFormEl.addEventListener('submit', e => {
 	// Clear the input field and focus
 	messageEl.value = ''
 	messageEl.focus()
+})
+
+// Get username from form and then show chat
+usernameFormEl.addEventListener('submit', e => {
+	e.preventDefault()
+
+	// Get username
+	username = (usernameFormEl.querySelector('#username') as HTMLInputElement).value.trim()
+
+	// If no username, NO CHAT FOR YOU
+	if (!username) {
+		return
+	}
+
+	// Show chat view
+	showChatView()
 })
