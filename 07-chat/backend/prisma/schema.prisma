@@ -1,8 +1,21 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model Room {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    name  String
+    users User[]
+}
+
+model User {
+    id     String @id @map("_id")
+    name   String
+    Room   Room   @relation(fields: [roomId], references: [id])
+    roomId String @db.ObjectId
 }
