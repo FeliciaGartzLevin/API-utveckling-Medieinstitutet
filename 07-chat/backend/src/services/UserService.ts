@@ -11,6 +11,10 @@ export const getUsersInRoom = async (roomId: string) => {
 	})
 }
 
+export const deleteAllUsers = async () => {
+	return await prisma.user.deleteMany()
+}
+
 // export const findRoomOfUser = async (socket.id: string) => {
 // 	return await prisma.user.findUnique({
 // 		where: {
