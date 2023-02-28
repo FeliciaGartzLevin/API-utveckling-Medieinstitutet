@@ -33,7 +33,7 @@ export interface NoticeData {
 }
 
 export interface RoomInfoData extends Room {
-	user: User[]
+	users: User[]
 }
 
 export interface UserJoinResult {

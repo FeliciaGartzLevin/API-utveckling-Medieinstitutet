@@ -232,12 +232,16 @@ usernameFormEl.addEventListener('submit', e => {
 	socket.emit('userJoin', username, roomId, (result)=> {
 		console.log("Join was success?", result)
 
-		if (!result.success) {
+		if (!result.success || !result.data) {
 			alert("NO ACCESS 4 US")
 			return
 		}
 
-		const roomInfo = result.data!
+		const roomInfo = result.data
+
+		// Update chat view title with room name
+		const chatTitleEl = document.querySelector('#chat-title') as HTMLHeadingElement
+		chatTitleEl.innerText = roomInfo.name
 
 		// Yay we're allowed to join
 		showChatView()
