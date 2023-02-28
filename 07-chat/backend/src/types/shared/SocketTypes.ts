@@ -6,6 +6,7 @@ export interface ServerToClientEvents {
 	hello: () => void
 	chatMessage: (data: ChatMessageData) => void
 	userJoined: (notice: NoticeData) => void
+	usersOnline: (callback: (users: User[]) => void) => void
 }
 
 // Events emitted by the client to the server
