@@ -1,21 +1,21 @@
-import { Room, User } from "@prisma/client"
-export {Room, User}
+import { Message, Room, User } from '@prisma/client'
 
+// Re-export Prisma models so frontend is happy
+export { Message, Room, User }
 
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
 	hello: () => void
-	chatMessage: (data: ChatMessageData) => void
+	chatMessage: (message: ChatMessageData) => void
 	userJoined: (notice: NoticeData) => void
 	onlineUsers: (users: User[]) => void
-
 }
 
 // Events emitted by the client to the server
 export interface ClientToServerEvents {
 	getRoomList: (callback: (rooms: Room[]) => void) => void
-	sendChatMessage: (data: ChatMessageData) => void
-	userJoin: ( username: string, roomId: string, callback: (result: UserJoinResult) => void) => void
+	sendChatMessage: (message: ChatMessageData) => void
+	userJoin: (username: string, roomId: string, callback: (result: UserJoinResult) => void) => void
 }
 
 // Events between servers
@@ -29,16 +29,19 @@ export interface ChatMessageData {
 	timestamp: number
 	username: string
 }
+
 // Notice payload
 export interface NoticeData {
-	username: string,
 	timestamp: number
+	username: string
 }
 
+// Room info payload
 export interface RoomInfoData extends Room {
-	users: User[]
+	messages: Message[]
 }
 
+// User Join result
 export interface UserJoinResult {
 	success: boolean
 	data: RoomInfoData | null

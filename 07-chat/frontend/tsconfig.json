@@ -15,7 +15,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "@backend/*": ["../backend/src/*"]        //detta gör att jag kan söka igenom hela backend-mappen och importera till frontend-mappen
+      "@backend/*": ["../backend/src/*"]
     },
   },
   "include": ["src"]

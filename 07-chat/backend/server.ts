@@ -31,27 +31,25 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
  * Handle incoming Socket.IO connection
  */
 io.on('connection', (socket) => {
-	// console.log('Yay, someone connected to me 👴', socket.id)
-	handleConnection(socket)
-
+	// Yay someone connected to me
+	handleConnection(socket, io)
 })
 
 /**
  * Delete all users from the database
  */
-deleteAllUsers().then(() => {
-	console.log("🧹 Deleted all users")
+deleteAllUsers()
+	.then(() => {
+		console.log("🧹 Deleted all users")
 
-	/**
-	 * Listen on provided port, on all network interfaces.
-	 */
-	httpServer.listen(PORT)
-})
-
-
+		/**
+		 * Listen on provided port, on all network interfaces.
+		 */
+		httpServer.listen(PORT)
+	})
 
 /**
- * Event listener for HTTP httpServer "error" event.
+ * Event listener for HTTP server "error" event.
  */
 httpServer.on('error', (err: NodeJS.ErrnoException) => {
 	if (err.syscall !== 'listen') {

@@ -3,9 +3,8 @@ import { io, Socket } from 'socket.io-client'
 import {
 	ChatMessageData,
 	ClientToServerEvents,
-	NoticeData,
 	ServerToClientEvents,
-	User
+	User,
 } from '@backend/types/shared/SocketTypes'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -29,6 +28,17 @@ let username: string | null = null
 // Connect to Socket.IO server
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
 
+// Add messages to the chat
+const addMessagesToChat = (messages: ChatMessageData[]) => {
+	// Clear any previous messages from the chat
+	messagesEl.innerHTML = ''
+
+	// Loop over messages and add them to the chat
+	messages.forEach(message => {
+		addMessageToChat(message)
+	})
+}
+
 // Add a message to the chat
 const addMessageToChat = (message: ChatMessageData, ownMessage = false) => {
 	// Create a new LI element
@@ -47,14 +57,14 @@ const addMessageToChat = (message: ChatMessageData, ownMessage = false) => {
 
 	// Set the text content of the LI element to the message
 	messageEl.innerHTML = ownMessage
-	? `
-	<span class="content">${message.content}</span>
-	<span class="time">${time}</span>
-	` : `
-	<span class="user">${message.username}</span>
-	<span class="content">${message.content}</span>
-	<span class="time">${time}</span>
-	`
+		? `
+			<span class="content">${message.content}</span>
+			<span class="time">${time}</span>
+		` : `
+			<span class="user">${message.username}</span>
+			<span class="content">${message.content}</span>
+			<span class="time">${time}</span>
+		`
 
 	// Append the LI element to the messages element
 	messagesEl.appendChild(messageEl)
@@ -105,9 +115,8 @@ const showWelcomeView = () => {
 	// Request a list of rooms from the server
 	console.log("🏨 Requesting rooms")
 	socket.emit('getRoomList', (rooms) => {
-		// we got loads of rooms
+		// We gots lots of rooms
 		console.log("YAY ROOMS!", rooms)
-
 
 		// Update #room with options for each room
 		roomEl.innerHTML = rooms
@@ -128,25 +137,29 @@ const showWelcomeView = () => {
 // Update online users list
 const updateOnlineUsers = (users: User[]) => {
 	const onlineUsersEl = document.querySelector('#online-users') as HTMLUListElement
+
+	console.log("updateOnlineUsers:", users)
+
 	onlineUsersEl.innerHTML = users
 		.map(user =>
 			user.id === socket.id
 				? `<li class="me"><span class="fa-solid fa-user-astronaut"></span> ${user.name}</li>`
 				: `<li><span class="fa-solid fa-user-astronaut"></span> ${user.name}</li>`
-		).join('')
+		)
+		.join('')
 }
 
 // Listen for when connection is established
 socket.on('connect', () => {
-	console.log('💥Connected to the server', socket.id)
+	console.log('💥 Connected to the server', socket.id)
 
 	// Show welcome view
 	showWelcomeView()
 })
 
-// Listen for when the server is restarting or stopping
+// Listen for when the server got tired of us
 socket.on('disconnect', () => {
-	console.log('Disconnected from the server 💀')
+	console.log('💀 Disconnected from the server')
 })
 
 // Listen for when we're reconnected
@@ -162,22 +175,23 @@ socket.io.on('reconnect', () => {
 
 // Listen for when the server says hello
 socket.on('hello', () => {
-	console.log('The nice server said hello 👋')
+	console.log('👋🏻 The nice server said Hello')
 })
 
 // Listen for new chat messages
 socket.on('chatMessage', (message) => {
-	console.log('📨 YAY SOMEONE WROTE SOMETHING!!!!!!!', message)
+	console.log('📨 Someone wrote something', message)
 
-	// print message to chat. boolean: is your it own message?
+	// Create a function called `addMessageToChat` that takes the
+	// `message` as a parameter and creates a new LI-element, sets
+	// the content + styling and appends it to `messagesEl`
 	addMessageToChat(message)
 })
 
-//Listen for a user joining
+// Listen for when a user joins the chat
 socket.on('userJoined', (notice) => {
-	console.log("We've got company")
+	console.log('👶🏽 A new user joined the chat', notice)
 
-	// print to chat that someone joined
 	addNoticeToChat(`${notice.username} has joined the chat`, notice.timestamp)
 })
 
@@ -190,22 +204,24 @@ socket.on('onlineUsers', (users) => {
 messageFormEl.addEventListener('submit', e => {
 	e.preventDefault()
 
-	if(!messageEl.value.trim() || !username || !roomId){
+	if (!messageEl.value.trim() || !username || !roomId) {
 		return
 	}
 
 	// Construct message payload
 	const message: ChatMessageData = {
-		username,
+		content: messageEl.value,
 		roomId,
 		timestamp: Date.now(),
-		content: messageEl.value,
+		username,  // username: username
 	}
 
-	// Send (emit) message to the server
+	// Send (emit) the message to the server
 	socket.emit('sendChatMessage', message)
 
-	// print message to chat. boolean: is your it own message?
+	// Extend the `addMessageToChat` function to know if the message
+	// was sent by us, and then add `.own-message` class to the
+	// LI-element before appending it to `messagesEl`
 	addMessageToChat(message, true)
 
 	console.log("Emitted 'sendChatMessage' event to server", message)
@@ -223,14 +239,14 @@ usernameFormEl.addEventListener('submit', e => {
 	roomId = (usernameFormEl.querySelector('#room') as HTMLSelectElement).value
 	username = (usernameFormEl.querySelector('#username') as HTMLInputElement).value.trim()
 
-	// If no username or roomId, NO CHAT FOR YOU
+	// If no username, NO CHAT FOR YOU
 	if (!username || !roomId) {
 		return
 	}
 
 	// Emit `userJoin`-event to the server and wait for acknowledgement
 	// before showing the chat view
-	socket.emit('userJoin', username, roomId, (result)=> {
+	socket.emit('userJoin', username, roomId, (result) => {
 		console.log("Join was success?", result)
 
 		if (!result.success || !result.data) {
@@ -244,15 +260,12 @@ usernameFormEl.addEventListener('submit', e => {
 		const chatTitleEl = document.querySelector('#chat-title') as HTMLHeadingElement
 		chatTitleEl.innerText = roomInfo.name
 
-		// Update userlist with users in the room
-		updateOnlineUsers(roomInfo.users)
+		// Add chat history to chat
+		addMessagesToChat(roomInfo.messages)
 
 		// Yay we're allowed to join
+		console.log("Showing chat view")
 		showChatView()
-
 	})
-
 	console.log("Emitted 'userJoin' event to server", username)
-
 })
-
